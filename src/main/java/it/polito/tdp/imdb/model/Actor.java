@@ -1,6 +1,8 @@
 package it.polito.tdp.imdb.model;
 
-public class Actor{
+import java.util.Comparator;
+
+public class Actor {
 	Integer id;
 	String firstName;
 	String lastName;
@@ -41,7 +43,7 @@ public class Actor{
 
 	@Override
 	public String toString() {
-		return lastName + ", " + firstName + " (" + id + ")";
+		return lastName + " "+ firstName+ " ("+id+")";
 	}
 
 	@Override
@@ -68,6 +70,8 @@ public class Actor{
 			return false;
 		return true;
 	}
+
+	
 
 	
 }

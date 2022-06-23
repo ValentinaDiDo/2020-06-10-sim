@@ -5,8 +5,13 @@
 package it.polito.tdp.imdb;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
+import org.jgrapht.Graph;
+import org.jgrapht.graph.DefaultWeightedEdge;
+
+import it.polito.tdp.imdb.model.Actor;
 import it.polito.tdp.imdb.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -18,6 +23,7 @@ import javafx.scene.control.TextField;
 public class FXMLController {
 	
 	private Model model;
+	boolean grafoCreato = false;
 
     @FXML // ResourceBundle that was given to the FXMLLoader
     private ResourceBundle resources;
@@ -35,10 +41,10 @@ public class FXMLController {
     private Button btnSimulazione; // Value injected by FXMLLoader
 
     @FXML // fx:id="boxGenere"
-    private ComboBox<?> boxGenere; // Value injected by FXMLLoader
+    private ComboBox<String> boxGenere; // Value injected by FXMLLoader
 
     @FXML // fx:id="boxAttore"
-    private ComboBox<?> boxAttore; // Value injected by FXMLLoader
+    private ComboBox<Actor> boxAttore; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtGiorni"
     private TextField txtGiorni; // Value injected by FXMLLoader
@@ -48,17 +54,62 @@ public class FXMLController {
 
     @FXML
     void doAttoriSimili(ActionEvent event) {
-
+    	if(this.grafoCreato == false) {
+    		txtResult.setText("DEVI PRIMA CREARE IL GRAFO");
+    	}else {
+    		Actor a = this.boxAttore.getValue();
+    		if(a == null) {
+    			txtResult.setText("SELEZIONA UN ATTORE");
+    		}else {
+    			//trovo gli attori simili
+    			List<Actor> actors = this.model.getSimili(a);
+    			for(Actor aa : actors) {
+    				txtResult.appendText("\n"+aa.toString());
+    			}
+    		}
+    		
+    		
+    	}
     }
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
-
+    	String genere = this.boxGenere.getValue();
+    	if(genere.equals(null)) {
+    		txtResult.setText("SELEZIONA UN GENERE");
+    	}else {
+    		this.model.creaGrafo(genere);
+    		Graph<Actor, DefaultWeightedEdge>grafo = this.model.getGrafo();
+    		
+    		txtResult.setText("GRAFO CREATO:\n");
+    		txtResult.appendText("# VERTICI :"+ grafo.vertexSet().size() );
+    		txtResult.appendText("\n# ARCHI :"+ grafo.edgeSet().size() );
+    		
+    		this.grafoCreato = true;
+    		
+    		this.boxAttore.getItems().clear();
+    		this.boxAttore.getItems().addAll(this.model.getActors());
+    	}
+ 
+    
     }
 
     @FXML
     void doSimulazione(ActionEvent event) {
-
+    	if(this.grafoCreato==false) {
+    		txtResult.setText("DEVI PRIMA CREARE IL GRAFO");
+    	}else {
+    		String n = txtGiorni.getText();
+    		try {
+    			int giorni = Integer.parseInt(n);
+    			this.model.attivaSimulazione(giorni);
+    			
+    			// ---- //
+    		}catch(NumberFormatException e) {
+    			e.printStackTrace();
+    			txtResult.setText("DEVI INSERIRE UN NUMERO");
+    		}
+    	}
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
@@ -75,5 +126,8 @@ public class FXMLController {
     
     public void setModel(Model model) {
     	this.model = model;
+    	
+    	this.boxGenere.getItems().clear();
+    	this.boxGenere.getItems().addAll(this.model.getGenres());
     }
 }

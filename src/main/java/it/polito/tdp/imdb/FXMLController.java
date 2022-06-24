@@ -104,7 +104,12 @@ public class FXMLController {
     			int giorni = Integer.parseInt(n);
     			this.model.attivaSimulazione(giorni);
     			
-    			// ---- //
+    			int pause = this.model.getPause();
+    			List<Actor> intervistati = (List<Actor>) this.model.getIntervistati();
+    			txtResult.setText("NUMERO DI PAUSE : "+pause);
+    			for(Actor a : intervistati) {
+    				txtResult.appendText("\n"+a.toString());
+    			}
     		}catch(NumberFormatException e) {
     			e.printStackTrace();
     			txtResult.setText("DEVI INSERIRE UN NUMERO");
